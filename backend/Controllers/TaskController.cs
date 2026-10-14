@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using TaskManager.API.Models;
 
 namespace TaskManager.API.Controllers;
@@ -8,12 +9,9 @@ namespace TaskManager.API.Controllers;
 public class TaskController : ControllerBase
 {
 
-    [HttpGet()]
-    public List<TaskItem> Get()
+    private readonly List<TaskItem> tasks = new List<TaskItem>
     {
-        var task = new List<TaskItem>
-       {
-          new TaskItem
+        new TaskItem
           {
               Id = 1,
               Title = "Build my task manager",
@@ -26,9 +24,25 @@ public class TaskController : ControllerBase
                 Title = "Add to GitHub",
                 IsCompleted = true
             }
-       };
+    };
 
-        return task;
+    [HttpGet()]
+    public List<TaskItem> Get()
+    {
+        return tasks;
+    }
+
+    [HttpGet("{id:int}")]
+    public ActionResult<TaskItem> GetById(int id)
+    {
+        foreach (var task in tasks)
+        {
+            if (task.Id == id)
+            {
+                return task;
+            }
+        }
+        return NotFound("Error. Please try again later.");
     }
 }
 
