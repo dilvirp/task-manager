@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 using TaskManager.API.Models;
+using TaskManager.API.DTOs;
+using TaskManager.API.Data;
 
 namespace TaskManager.API.Controllers;
 
@@ -8,41 +9,48 @@ namespace TaskManager.API.Controllers;
 [Route("api/tasks")]
 public class TaskController : ControllerBase
 {
+    private readonly TaskDbContext _context;
 
-    private readonly List<TaskItem> tasks = new List<TaskItem>
+    public TaskController(TaskDbContext content)
     {
-        new TaskItem
-          {
-              Id = 1,
-              Title = "Build my task manager",
-              IsCompleted = false
-          },
+        _context = content;
+    }
 
-            new TaskItem
-            {
-                Id = 2,
-                Title = "Add to GitHub",
-                IsCompleted = true
-            }
-    };
 
     [HttpGet()]
     public List<TaskItem> Get()
     {
-        return tasks;
+        return _context.Tasks.ToList();
     }
 
     [HttpGet("{id:int}")]
     public ActionResult<TaskItem> GetById(int id)
     {
-        foreach (var task in tasks)
+        var task = _context.Tasks.Find(id);
+
+        if (task == null)
         {
-            if (task.Id == id)
-            {
-                return task;
-            }
+            return NotFound("Task not found.");
         }
-        return NotFound("Error. Please try again later.");
+
+        return Ok(task);
+    }
+
+    [HttpPost()]
+    public ActionResult<TaskItem> Create([FromBody] CreateTaskRequest request)
+    {
+        var task = new TaskItem
+        {
+            Title = request.Title,
+            IsCompleted = false
+        };
+
+        _context.Tasks.Add(task);
+
+        _context.SaveChanges();
+
+        return Ok(task);
+
     }
 }
 

@@ -1,6 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+using TaskManager.API.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<TaskDbContext>(options => options.UseSqlite("Data Source=taskmanager.db"));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
