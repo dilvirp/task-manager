@@ -49,8 +49,48 @@ public class TaskController : ControllerBase
 
         _context.SaveChanges();
 
-        return Ok(task);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = task.Id },
+            task
+        );
 
+    }
+
+    [HttpPut("{id:int}")]
+    public IActionResult Update(int id, [FromBody] UpdateTaskRequest request)
+    {
+        var task = _context.Tasks.Find(id);
+
+        if (task == null)
+        {
+            return NotFound("Task not found!");
+        }
+
+        task.Title = request.Title;
+        task.IsCompleted = request.IsCompleted;
+
+
+        _context.SaveChanges();
+
+        return Ok(task);
+    }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+        var task = _context.Tasks.Find(id);
+
+        if (task == null)
+        {
+            return NotFound("Task not found!");
+        }
+
+        _context.Tasks.Remove(task);
+
+        _context.SaveChanges();
+
+        return NoContent();
     }
 }
 
