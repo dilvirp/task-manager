@@ -14,3 +14,9 @@ dist/
 # Local IDE files 
 .vs/
 *.user
+
+# Local Sqlite database and companion files 
+*.db
+*.db-shm
+*.db-wal
+*.db.journal
